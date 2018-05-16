@@ -11,3 +11,13 @@ Checks whether array is empty <br/>
 Returns the element with the least priority (Early Alphabet Letters) <br/>
 4) removeMin()   -->   O(n) <br/>
 Removes and returns the element with the least priority
+
+# heap todo
+  1. ~~Constructor~~
+  2. ~~isEmpty()~~
+  3. ~~add()~~
+  4. ~~peekMin()~~
+  5. ~~minChildPos()~~
+  6. ~~removeMin()~~
+  7. ~~toString()~~
+  6. Voila!
