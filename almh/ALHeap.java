@@ -61,11 +61,20 @@ public class ALHeap {
         return _heap.get(0);
     }//O(1)
 
-
+    
     /*****************************************************
     * add(Integer) 
     * Inserts an element in the heap
     * Postcondition: Tree exhibits heap property.
+    
+    Algo:
+	1. Traverse the root's left subtree 
+	2. Insert the node a the farthest left location possible(if parent has no children, make the 
+           node the parent's left child).
+	3. Compare the value of the new node to the parent 
+	4. If the node's value is greater than the parent's value, then it's done. If not, 
+ 	   swap the values.
+    5. Repeat 4.) until the node's value is greater than its parent's value 
     *****************************************************/
     public void add( Integer addVal ){
         boolean added = false;
@@ -89,6 +98,20 @@ public class ALHeap {
     * removeMin()  ---  means of removing an element from heap
     * Removes and returns least element in heap.
     * Postcondition: Tree maintains heap property.
+    
+    Algo: 
+	1. Traverse the tree until it finds the target value 
+	2. Once the target is found, use another node to find the farthest right node (the maximum) 
+       in the subtree  
+    3. Set the maximum's parent's pointer to null and replace the value of the target with 
+       the maximum value. 
+    4. Starting from the root, traverse the subtree where the target was 
+    5. Compare the value of the root to the value of the maximum. If the root's value is less 
+       than the maximum, keep traversing the left subtree. If not, swap values. 
+	6. Compare the value of the maximum to its child/children. If the maximum's value is greater
+       than its child's value, swap values. If the maximum has two children and its value is greater
+       than both, swap values with the smaller value. 
+    7. Keep traversing and repeat 6.) until you reach the leaves
     *****************************************************/
     public Integer removeMin(){
         if (isEmpty()) return null;
