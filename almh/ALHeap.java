@@ -6,166 +6,197 @@
 
 import java.util.ArrayList;
 
-public class ALHeap {
+public class ALHeap
+{
 
-    //instance vars
-    private ArrayList<Integer> _heap; 
+  //instance vars
+  private ArrayList<Integer> _heap; 
 
-    /*****************************************************
-    * default constructor  ---  inits empty heap
-    *****************************************************/
-    public ALHeap() {
-        _heap = new ArrayList();
-    }
+  /*****************************************************
+   * default constructor  ---  inits empty heap
+   *****************************************************/
+  public ALHeap() 
+  {
+	_heap = new ArrayList<Integer>();      
+  }
 
 
 
-    /*****************************************************
-    * toString()  ---  overrides inherited method
-    * Returns either 
-    * a) a level-order traversal of the tree (simple version)
-    * b) ASCII representation of the tree (more complicated, more fun)
-    *****************************************************/
-    public String toString() {
-        String s = "";
-        int ctr = 0;
-        int max = 1;
-        for (Integer x : _heap) {
-            s += x + " ";
-            ctr ++;
-            if ( ctr == max ) {
-                s += "| ";
-                ctr = 0;
-                max *= 2;
-            }
-        }
-        return s;
+  /*****************************************************
+   * toString()  ---  overrides inherited method
+   * Returns either 
+   * a) a level-order traversal of the tree (simple version)
+   * b) ASCII representation of the tree (more complicated, more fun)
+   *****************************************************/
+  public String toString() 
+  {
+	//simple version:
+	//return _heap.toString(); 
+
+	//prettier version:
+	String lvlOrdTrav = "heap size " + _heap.size() + "\n";
+
+	if ( _heap.size() == 0 ) return lvlOrdTrav;
+
+	int h = 1; //init height to 1
+	for( int i = 0; i < _heap.size(); i++ ) {
+	    lvlOrdTrav += i + ":" + _heap.get(i) + " ";
+	    if ( i >= Math.pow(2,h) - 2 ) {
+		lvlOrdTrav += "\n";
+		h++;
+	    }
+	}
+	return lvlOrdTrav;
     }//O(n)
 
 
-    /*****************************************************
-    * boolean isEmpty()
-    * Returns true if no meaningful elements in heap, false otherwise
-    *****************************************************/
-    public boolean isEmpty() {
-        return _heap.isEmpty();
-    }//O(1)
+  /*****************************************************
+   * boolean isEmpty()
+   * Returns true if no meaningful elements in heap, false otherwise
+   *****************************************************/
+  public boolean isEmpty() { return _heap.isEmpty(); } //O(1)
 
 
-    /*****************************************************
-    * Integer peekMin()
-    * Returns min value in heap
-    * Postcondition: Heap remains unchanged.
-    *****************************************************/
-    public Integer peekMin(){
-        return _heap.get(0);
-    }//O(1)
+  /*****************************************************
+   * Integer peekMin()
+   * Returns min value in heap
+   * Postcondition: Heap remains unchanged.
+   *****************************************************/
+  public Integer peekMin()
+  { 
+ 	if ( _heap.size() < 1 )
+	    return null;
+	else
+	    return _heap.get(0); 
+    } //O(1)
 
-    
-    /*****************************************************
-    * add(Integer) 
-    * Inserts an element in the heap
-    * Postcondition: Tree exhibits heap property.
-    
-    Algo:
-	1. Traverse the root's left subtree 
-	2. Insert the node a the farthest left location possible(if parent has no children, make the 
-           node the parent's left child).
-	3. Compare the value of the new node to the parent 
-	4. If the node's value is greater than the parent's value, then it's done. If not, 
- 	   swap the values.
-    5. Repeat 4.) until the node's value is greater than its parent's value 
-    *****************************************************/
-    public void add( Integer addVal ){
-        boolean added = false;
-        for (int i = 0; i < _heap.size(); i ++)
-            if ( _heap.get(i) == null ) {
-                _heap.set(i, addVal);
-                added = true;
-                break;
-            }
-        if ( !added )
-            _heap.add( addVal );
-        int i = _heap.indexOf( addVal );
-        while ( _heap.get(i).compareTo( _heap.get( (i-1)/2 )) < 0 ) {
-            swap( i, (i-1)/2 );
-            i = (i-1)/2;
-        }
+
+  /*****************************************************
+   * add(Integer) 
+   * Inserts an element in the heap
+   * Postcondition: Tree exhibits heap property.
+   *****************************************************/
+  public void add( Integer addVal )
+  { 
+
+	//Add value as last node, to maintain balance, completeness of tree
+	_heap.add( addVal );
+
+	int addValPos = _heap.size() - 1;
+	int parentPos;
+
+	while( addValPos > 0 ) { //potentially swap until reach root
+
+	    //pinpoint parent
+	    parentPos = (addValPos-1) / 2;
+
+	    if ( addVal.compareTo(_heap.get(parentPos)) < 0 ) {//addVal < parent
+		swap( addValPos, parentPos );
+		addValPos = parentPos;
+	    }
+	    else 
+		break;
+	}
+    } //O(logn)
+
+
+  /*****************************************************
+   * removeMin()  ---  means of removing an element from heap
+   * Removes and returns least element in heap.
+   * Postcondition: Tree maintains heap property.
+   *****************************************************/
+  public Integer removeMin()
+  { 
+  	if ( _heap.size() == 0 ) 
+	    return null;
+
+	//store root value for return at end of fxn
+	Integer retVal = peekMin();
+
+	//store val about to be swapped into root
+	Integer foo = _heap.get( _heap.size() - 1);
+
+	//swap last (rightmost, deepest) leaf with root
+	swap( 0, _heap.size() - 1 );
+
+	//lop off last leaf
+	_heap.remove( _heap.size() - 1);
+
+	// walk the now-out-of-place root node down the tree...
+	int pos = 0;
+	int minChildPos;
+
+	while( pos < _heap.size() ) {
+
+	    //choose child w/ min value, or check for child
+	    minChildPos = minChildPos(pos);
+
+	    //if no children, then i've walked far enough
+	    if ( minChildPos == -1 ) 
+		break;
+	    //if i am less than my least child, then i've walked far enough
+	    else if ( foo.compareTo( _heap.get(minChildPos) ) <= 0 ) 
+		break;
+	    //if i am > least child, swap with that child
+	    else {
+		swap( pos, minChildPos );
+		pos = minChildPos;
+	    }
+	}
+	//return removed value
+	return retVal;
     }//O(logn)
 
 
-    /*****************************************************
-    * removeMin()  ---  means of removing an element from heap
-    * Removes and returns least element in heap.
-    * Postcondition: Tree maintains heap property.
-    
-    Algo: 
-	1. Traverse the tree until it finds the target value 
-	2. Once the target is found, use another node to find the farthest right node (the maximum) 
-       in the subtree  
-    3. Set the maximum's parent's pointer to null and replace the value of the target with 
-       the maximum value. 
-    4. Starting from the root, traverse the subtree where the target was 
-    5. Compare the value of the root to the value of the maximum. If the root's value is less 
-       than the maximum, keep traversing the left subtree. If not, swap values. 
-	6. Compare the value of the maximum to its child/children. If the maximum's value is greater
-       than its child's value, swap values. If the maximum has two children and its value is greater
-       than both, swap values with the smaller value. 
-    7. Keep traversing and repeat 6.) until you reach the leaves
-    *****************************************************/
-    public Integer removeMin(){
-        if (isEmpty()) return null;
-        int min = _heap.get(0);
-        int i = 0;
-        while ( minChildPos(i) != -1 ) {
-            swap( i, minChildPos(i) );
-            i = minChildPos(i);
-        }
-        _heap.set(i, null);
-        while ( !isEmpty() && _heap.get( _heap.size() - 1) == null )
-            _heap.remove( _heap.size() - 1 );
-        return min;
-    }//O(logn)
+  /*****************************************************
+   * minChildPos(int)  ---  helper fxn for removeMin()
+   * Returns index of least child, or 
+   * -1 if no children, or if input pos is not in ArrayList
+   * Postcondition: Tree unchanged
+   *****************************************************/
+  private int minChildPos( int pos )
+  { 
+  	int retVal;
+	int lc = 2*pos + 1; //index of left child
+	int rc = 2*pos + 2; //index of right child
 
-
-    /*****************************************************
-    * minChildPos(int)  ---  helper fxn for removeMin()
-    * Returns index of least child, or 
-    * -1 if no children, or if input pos is not in ArrayList
-    * Postcondition: Tree unchanged
-    *****************************************************/
-    private int minChildPos( int pos ) {
-        int pos1 = pos * 2 + 1;
-        int pos2 = pos * 2 + 2;
-        if ( pos1 >= _heap.size() )
-            return -1;
-        if ( pos2 >= _heap.size() || _heap.get(pos2) == null )
-            return pos1;
-        if ( _heap.get(pos1) == null )
-            return pos2;
-        return _heap.indexOf( minOf( _heap.get(pos1), _heap.get(pos2) ));
+	//pos is not in the heap or pos is a leaf position
+	if ( pos < 0 || pos >= _heap.size() || lc >= _heap.size() )
+	    retVal = -1;
+	//if no right child, then left child is only option for min
+	else if ( rc >= _heap.size() )
+	    retVal = lc;
+	//have 2 children, so compare to find least 
+	else if ( _heap.get(lc).compareTo(_heap.get(rc)) < 0 )
+	    retVal = lc;
+	else
+	    retVal = rc;
+	return retVal;
     }//O(1)
+
   
 
-    //************ aux helper fxns ***************
-    private Integer minOf( Integer a, Integer b ){
-        if ( a.compareTo(b) < 0 )
-            return a;
-        else
-            return b;
-    }
+  //************ aux helper fxns ***************
+  private Integer minOf( Integer a, Integer b )
+  {
+    if ( a.compareTo(b) < 0 )
+	    return a;
+    else
+	    return b;
+  }
 
-    //swap for an ArrayList
-    private void swap( int pos1, int pos2 ){
-        _heap.set( pos1, _heap.set( pos2, _heap.get(pos1) ) );
-    }
-    //********************************************
+  //swap for an ArrayList
+  private void swap( int pos1, int pos2 )
+  {
+    _heap.set( pos1, _heap.set( pos2, _heap.get(pos1) ) );	
+  }
+  //********************************************
 
 
 
-    //main method for testing
-    public static void main( String[] args ){
-    
+  //main method for testing
+  public static void main( String[] args )
+  {
       ALHeap pile = new ALHeap();
 
       pile.add(2);
@@ -211,8 +242,8 @@ public class ALHeap {
       System.out.println(pile);
       System.out.println("removing " + pile.removeMin() + "...");
       System.out.println(pile);
-      /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-    }//end main()
+  }//end main()
 
 }//end class ALHeap
