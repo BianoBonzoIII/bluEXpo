@@ -4,39 +4,49 @@
    to find the median of a stream of numbers
 
 Algo: 
-1.) Add the upper half of the stream of Integers to the maxHeap and add the
-    lower half of the stream of Integers to the minHeap. If the next value is
-    < root of maxHeap, add the value to maxHeap. If not, add to minHeap.  
+1.) Add the upper half of the stream of Integers to the bigVals and add the
+    lower half of the stream of Integers to the lilVals. If the next value is
+    < root of bigVals, add the value to bigVals. If not, add to lilVals.  
 
-2.) Remove from maxHeap and add those removed values to minHeap until the 
+2.) Remove from bigVals and add those removed values to lilVals until the 
     heaps are balanced ( size difference < 2 )
 
 3.) If the heap sizes are = --> return the median of the roots of both heaps 
-    If the heap sizes are != --> return the root of maxHeap 
+    If the heap sizes are != --> return the root of bigVals 
 *****************************************************/
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class RunMed
 {
 
     //instance vars
-    private ALHeapMin minHeap;
-    private ALHeapMax maxHeap;
+    private ALHeapMin lilVals;
+    private ALHeapMax bigVals;
     
     /*****************************************************
      * default constructor  ---  inits 2 empty heaps
      *****************************************************/
     public RunMed() {
-	minHeap = new ALHeapMin();
-	maxHeap = new ALHeapMax();
+	lilVals = new ALHeapMin();
+	bigVals = new ALHeapMax();
     }
 
     /*****************************************************
      * getMedian()  ---  returns the median from a stream of ints
      * Postcondition: Stream of ints remain unchanged
      *****************************************************/
-    public Integer getMedian() {
+    public double getMedian() {
+	double med;
+        if (bigVals.size() == 0){
+	    throw new NoSuchElementException();
+	}if (bigVals.size() == lilVals.size()){
+	    med = (bigVals.peekMax() + lilVals.peekMin()) / 2.0;
+	}else{
+	    med = bigVals.peekMax();
+	}
+        return med;
     }
     
     /*****************************************************
@@ -45,9 +55,24 @@ public class RunMed
      * Postcondition: Tree exhibits appropiate heap property.
      *****************************************************/
     public void add( Integer newVal ) {
+	if( bigVals.size() == 0){
+	    bigVals.add(newVal);
+	}else if( newVal < bigVals.peekMax()){
+	    bigVals.add(newVal);
+	}else{
+	    lilVals.add(newVal);
+	}
+	if( Math.abs(bigVals.size() - lilVals.size()) >= 2){
+	    if( lilVals.size() <= bigVals.size()){
+		lilVals.add(bigVals.removeMax());
+	    }else{
+		bigVals.add(lilVals.removeMin());
+	    }
+	}
     }
     
     //main method for testing
+    /*
     public static void main( String[] args )
     {
 	RunMed beck = new RunMed();
@@ -75,8 +100,7 @@ public class RunMed
 	System.out.println( ALHeapMin );
 	System.out.println( ALHeapMax );
 	System.out.println( beck.getMedian() );	
-	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-    }//end main()
-
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	}//end main()*/
 }//end class RunMed
