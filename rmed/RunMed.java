@@ -29,8 +29,8 @@ public class RunMed
      * default constructor  ---  inits 2 empty heaps
      *****************************************************/
     public RunMed() {
-	lilVals = new ALHeapMin();
-	bigVals = new ALHeapMax();
+        lilVals = new ALHeapMin();
+        bigVals = new ALHeapMax();
     }
 
     /*****************************************************
@@ -38,14 +38,15 @@ public class RunMed
      * Postcondition: Stream of ints remain unchanged
      *****************************************************/
     public double getMedian() {
-	double med;
-        if (bigVals.size() == 0){
-	    throw new NoSuchElementException();
-	}if (bigVals.size() == lilVals.size()){
-	    med = (bigVals.peekMax() + lilVals.peekMin()) / 2.0;
-	}else{
-	    med = bigVals.peekMax();
-	}
+        double med;
+        if (bigVals.size() == 0)
+            throw new NoSuchElementException();
+        if (bigVals.size() == lilVals.size())
+            med = (bigVals.peekMax() + lilVals.peekMin()) / 2.0;
+        else if (bigVals.size() > lilVals.size())
+            med = bigVals.peekMax();
+        else
+            med = lilVals.peekMin();
         return med;
     }
     
@@ -55,27 +56,22 @@ public class RunMed
      * Postcondition: Tree exhibits appropiate heap property.
      *****************************************************/
     public void add( Integer newVal ) {
-	if( bigVals.size() == 0){
-	    bigVals.add(newVal);
-	}else if( newVal < bigVals.peekMax()){
-	    bigVals.add(newVal);
-	}else{
-	    lilVals.add(newVal);
-	}
-	if( Math.abs(bigVals.size() - lilVals.size()) >= 2){
-	    if( lilVals.size() <= bigVals.size()){
-		lilVals.add(bigVals.removeMax());
-	    }else{
-		bigVals.add(lilVals.removeMin());
-	    }
-	}
+        if( bigVals.size() == 0 ||
+            newVal < bigVals.peekMax() )
+            bigVals.add(newVal);
+        else
+            lilVals.add(newVal);
+        if (bigVals.size() - lilVals.size() > 1)
+            lilVals.add( bigVals.removeMax() );
+        else if (lilVals.size() - bigVals.size() > 1)
+            bigVals.add( lilVals.removeMin() );
     }
     
     //main method for testing
-    /*
+    
     public static void main( String[] args )
     {
-	RunMed beck = new RunMed();
+	/* RunMed beck = new RunMed();
 	
 	for (int i = 0; i < 5; i++) { // 5 total elements
 	    Integer call = new Integer( (int) (Math.random() * 10) );
@@ -99,8 +95,29 @@ public class RunMed
 	}
 	System.out.println( ALHeapMin );
 	System.out.println( ALHeapMax );
-	System.out.println( beck.getMedian() );	
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	}//end main()*/
+	System.out.println( beck.getMedian() );	 */
+    RunMed rm = new RunMed();
+    rm.add(8);
+    rm.add(2);
+    rm.add(4);
+    rm.add(9);
+    rm.add(3);
+    rm.add(1);
+    rm.add(20);
+    rm.add(5);
+    rm.add(7);
+    rm.add(12);
+    rm.add(13);
+    rm.add(19);
+    rm.add(26);
+    rm.add(24);
+    rm.add(-6);
+    rm.add(80);
+    rm.add(-42);
+    rm.add(-3);
+    System.out.println( rm.getMedian() ); // 7.5
+    
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	}//end main()
 }//end class RunMed
